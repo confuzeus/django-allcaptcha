@@ -239,3 +239,5 @@ media
 /.coverage
 paddle_pubkey.txt
 db.sqlite3
+
+django_allcaptcha/extra_settings.py
