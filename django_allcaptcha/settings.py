@@ -122,7 +122,4 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CAPTCHA_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001"
-CAPTCHA_SECRET_KEY = "0x0000000000000000000000000000000000000000"
-
-CAPTCHA_PROVIDER = "hcaptcha"
+from .extra_settings import *
