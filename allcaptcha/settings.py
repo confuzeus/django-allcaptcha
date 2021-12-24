@@ -15,6 +15,7 @@ HCAPTCHA_SECRET_KEY = getattr(settings, "HCAPTCHA_SECRET_KEY", None)
 HCAPTCHA_SITE_KEY = getattr(settings, "HCAPTCHA_SITE_KEY", None)
 
 HCAPTCHA_JS = getattr(settings, "HCAPTCHA_JS", "https://js.hcaptcha.com/1/api.js")
+HCAPTCHA_JS_CALLBACK = getattr(settings, "HCAPTCHA_JS_CALLBACK", "onHcaptchaSubmit")
 
 if not HCAPTCHA_SECRET_KEY:
     raise_for_attr("HCAPTCHA_SECRET_KEY")
@@ -28,7 +29,10 @@ if PROVIDER == HCAPTCHA_PROVIDER_NAME:
     CAPTCHA_SITE_KEY = HCAPTCHA_SITE_KEY
     CAPTCHA_SECRET_KEY = HCAPTCHA_SECRET_KEY
     PROVIDER_URL = HCAPTCHA_URL
+    PROVIDER_CLASS_NAME = "h-captcha"
     PROVIDER_JS = HCAPTCHA_JS
+    PROVIDER_JS_CALLBACK = HCAPTCHA_JS_CALLBACK
+
 else:
     raise ImproperlyConfigured(
         _(f'Provider  "{PROVIDER}" hasn\'t been implemented yet.')
