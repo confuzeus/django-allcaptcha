@@ -18,4 +18,4 @@ class CaptchaFormMixin(BaseForm):
         raise ValidationError(_("Anti spam verification failed. Please try again."))
 
     class Media:
-        js = (settings.PROVIDER_JS,)
+        js = (settings.PROVIDER_JS, "allcaptcha/allcaptcha.min.js")
