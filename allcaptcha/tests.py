@@ -6,6 +6,7 @@ from django.test import TestCase
 from allcaptcha.mixins import CaptchaFormMixin
 from . import settings
 from . import utils
+from .templatetags import allcaptcha_tags
 
 
 class AForm(forms.Form):
@@ -145,3 +146,21 @@ class AllCaptchaTests(TestCase):
             form = ACaptchaedForm({"h-captcha-response": ""})
 
             self.assertTrue(form.is_valid())
+
+    def test_templatetags(self):
+
+        sitekey = allcaptcha_tags.get_sitekey()
+
+        self.assertEqual(sitekey, settings.CAPTCHA_SITE_KEY)
+
+        klass = allcaptcha_tags.get_challenge_class()
+
+        self.assertEqual(klass, settings.PROVIDER_CLASS_NAME)
+
+        challenge_ctx = allcaptcha_tags.render_challenge()
+
+        self.assertEqual(challenge_ctx["challenge_type"], "visible")
+        self.assertEqual(challenge_ctx["callback"], settings.PROVIDER_JS_CALLBACK)
+        self.assertEqual(challenge_ctx["text"], "submit")
+        self.assertEqual(challenge_ctx["class_name"], settings.PROVIDER_CLASS_NAME)
+        self.assertEqual(challenge_ctx["sitekey"], settings.CAPTCHA_SITE_KEY)
