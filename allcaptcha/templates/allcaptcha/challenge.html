@@ -1,0 +1,6 @@
+{% if challenge_type == "visible" %}
+    <div class="{{ class_name }}" data-sitekey="{{ sitekey }}"></div>
+{% else %}
+    <button type="button" class="{{ class_name }}" data-sitekey="{{ sitekey }}" data-callback="{{ callback }}">{{ text }}</button>
+{% endif %}
+
