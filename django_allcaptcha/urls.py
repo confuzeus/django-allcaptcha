@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from django_allcaptcha.views import form_view
+from django_allcaptcha.views import form_view, index
 
-urlpatterns = [path("admin/", admin.site.urls), path("", form_view, name="home")]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("forms/<str:challenge_type>/", form_view, name="form"),
+    path("", index, name="home"),
+]
