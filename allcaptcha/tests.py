@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from django import forms
 from django.test import TestCase
 
-from allcaptcha.mixins import HCaptchaFormMixin
+from allcaptcha.mixins import CaptchaFormMixin
 from . import settings
 from . import utils
 
@@ -12,7 +12,7 @@ class AForm(forms.Form):
     pass
 
 
-class ACaptchaedForm(HCaptchaFormMixin, AForm):
+class ACaptchaedForm(CaptchaFormMixin, AForm):
     pass
 
 
@@ -129,3 +129,19 @@ class AllCaptchaTests(TestCase):
             mock_requests.post.return_value = response
 
             self.assertFalse(utils.valid_response("abcd"))
+
+    def test_hcaptcha_form_mixin(self):
+
+        with patch("allcaptcha.mixins.valid_response") as mock:
+
+            mock.return_value = False
+
+            form = ACaptchaedForm({"h-captcha-response": ""})
+
+            self.assertFalse(form.is_valid())
+
+            mock.return_value = True
+
+            form = ACaptchaedForm({"h-captcha-response": ""})
+
+            self.assertTrue(form.is_valid())
