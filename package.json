@@ -1,0 +1,23 @@
+{
+  "name": "django_allcaptcha",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "terser staticSrc/allcaptcha.js --compress --mangle -o allcaptcha/static/allcaptcha/allcaptcha.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/confuzeus/django-allcaptcha.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/confuzeus/django-allcaptcha/issues"
+  },
+  "homepage": "https://github.com/confuzeus/django-allcaptcha#readme",
+  "devDependencies": {
+    "terser": "^5.10.0"
+  }
+}
