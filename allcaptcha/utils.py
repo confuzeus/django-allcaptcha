@@ -15,6 +15,8 @@ def get_captcha_response(form: BaseForm) -> str:
     captcha_response = ""
     if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME:
         captcha_response = form.data.get("h-captcha-response", "")
+    elif settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME:
+        captcha_response = form.data.get("g-recaptcha-response", "")
     return captcha_response
 
 
@@ -25,6 +27,13 @@ def _build_submission_data(response: str) -> dict:
             {
                 "secret": settings.CAPTCHA_SECRET_KEY,
                 "sitekey": settings.CAPTCHA_SITE_KEY,
+                "response": response,
+            }
+        )
+    elif settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME:
+        data.update(
+            {
+                "secret": settings.CAPTCHA_SECRET_KEY,
                 "response": response,
             }
         )
@@ -40,12 +49,30 @@ def _determine_success(provider_response: Optional[Response]) -> bool:
                 success = provider_response.json()["success"]
             except Exception as e:
                 log.exception(e)
+        elif settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME:
+            try:
+                json = provider_response.json()
+                recaptcha_success = json["success"]
+                if recaptcha_success:
+                    if settings.RECAPTCHA_VERSION == 3:
+
+                        score = json["score"]
+
+                        if score >= settings.RECAPTCHA_MIN_SCORE:
+                            success = True
+                    else:
+                        success = True
+            except Exception as e:
+                log.exception(e)
     return success
 
 
 def _get_provider_response(data: dict) -> Optional[Response]:
     provider_response = None
-    if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME:
+    if (
+        settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME
+        or settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME
+    ):
         try:
             provider_response = requests.post(settings.PROVIDER_URL, data=data)
         except Exception as e:

@@ -26,7 +26,10 @@ def render_challenge(challenge_type="visible", text="submit") -> dict:
         "callback": settings.PROVIDER_JS_CALLBACK,
         "text": text,
     }
-    if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME:
+    if (
+        settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME
+        or settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME
+    ):
         ctx.update(
             {
                 "class_name": settings.PROVIDER_CLASS_NAME,

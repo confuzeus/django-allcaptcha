@@ -23,11 +23,16 @@ RECAPTCHA_URL = getattr(
     settings, "RECAPTCHA_URL", "https://www.google.com/recaptcha/api/siteverify"
 )
 
-RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
-RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
+RECAPTCHA_V2_SECRET_KEY = getattr(settings, "RECAPTCHA_V2_SECRET_KEY", None)
+RECAPTCHA_V2_SITE_KEY = getattr(settings, "RECAPTCHA_V2_SITE_KEY", None)
 
 RECAPTCHA_JS = "https://www.google.com/recaptcha/api.js"
-RECAPTCHA_JS_CALLBACK = "onRecaptchaSubmit"
+RECAPTCHA_JS_CALLBACK = getattr(settings, "RECAPTCHA_JS_CALLBACK", "onRecaptchaSubmit")
+
+RECAPTCHA_VERSION = getattr(settings, "RECAPTCHA_VERSION", 2)
+
+if RECAPTCHA_VERSION == 3:
+    RECAPTCHA_MIN_SCORE = getattr(settings, "RECAPTCHA_MIN_SCORE", 0.6)
 
 PROVIDER = getattr(settings, "CAPTCHA_PROVIDER", HCAPTCHA_PROVIDER_NAME)
 
@@ -44,14 +49,17 @@ if PROVIDER == HCAPTCHA_PROVIDER_NAME:
     PROVIDER_JS = HCAPTCHA_JS
     PROVIDER_JS_CALLBACK = HCAPTCHA_JS_CALLBACK
 elif PROVIDER == RECAPTCHA_PROVIDER_NAME:
-    if not RECAPTCHA_SECRET_KEY:
-        raise_for_attr("RECAPTCHA_SECRET_KEY")
+    if RECAPTCHA_VERSION == 2:
+        if not RECAPTCHA_V2_SECRET_KEY:
+            raise_for_attr("RECAPTCHA_V2_SECRET_KEY")
 
-    if not RECAPTCHA_SITE_KEY:
-        raise_for_attr("RECAPTCHA_SITE_KEY")
+        if not RECAPTCHA_V2_SITE_KEY:
+            raise_for_attr("RECAPTCHA_V2_SITE_KEY")
+    else:
+        raise ImproperlyConfigured("Recaptcha V3 not implemented yet!")
 
-    CAPTCHA_SITE_KEY = RECAPTCHA_SITE_KEY
-    CAPTCHA_SECRET_KEY = RECAPTCHA_SECRET_KEY
+    CAPTCHA_SITE_KEY = RECAPTCHA_V2_SITE_KEY
+    CAPTCHA_SECRET_KEY = RECAPTCHA_V2_SECRET_KEY
     PROVIDER_URL = RECAPTCHA_URL
     PROVIDER_CLASS_NAME = "g-recaptcha"
     PROVIDER_JS = RECAPTCHA_JS
