@@ -11,15 +11,26 @@ def get_sitekey():
 
 @register.simple_tag
 def get_challenge_class():
-    klass = ""
-    if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME:
-        klass = "h-captcha"
-    return klass
+    return settings.PROVIDER_CLASS_NAME
 
 
-@register.inclusion_tag("challenge.html")
-def render_challenge() -> dict:
-    ctx = {}
+@register.simple_tag
+def get_callback_name():
+    return settings.PROVIDER_JS_CALLBACK
+
+
+@register.inclusion_tag("allcaptcha/challenge.html")
+def render_challenge(challenge_type="visible", text="submit") -> dict:
+    ctx = {
+        "challenge_type": challenge_type,
+        "callback": settings.PROVIDER_JS_CALLBACK,
+        "text": text,
+    }
     if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME:
-        ctx.update({"class_name": "h-captcha", "sitekey": settings.CAPTCHA_SITE_KEY})
+        ctx.update(
+            {
+                "class_name": settings.PROVIDER_CLASS_NAME,
+                "sitekey": settings.CAPTCHA_SITE_KEY,
+            }
+        )
     return ctx
