@@ -19,14 +19,20 @@ class ACaptchaedForm(CaptchaFormMixin, AForm):
 
 class AllCaptchaTests(TestCase):
     def test_get_captcha_response(self):
+        with patch("allcaptcha.utils.settings") as mock_settings:
+            # Test with HCaptcha
+            mock_settings.HCAPTCHA_PROVIDER_NAME = settings.HCAPTCHA_PROVIDER_NAME
+            mock_settings.PROVIDER = settings.HCAPTCHA_PROVIDER_NAME
+            mock_settings.CAPTCHA_SECRET_KEY = settings.HCAPTCHA_SECRET_KEY
+            mock_settings.CAPTCHA_SITE_KEY = settings.HCAPTCHA_SITE_KEY
 
-        form = ACaptchaedForm({"h-captcha-response": "abcd"})
-        captcha_response = utils.get_captcha_response(form)
-        self.assertEqual(captcha_response, "abcd")
+            form = ACaptchaedForm({"h-captcha-response": "abcd"})
+            captcha_response = utils.get_captcha_response(form)
+            self.assertEqual(captcha_response, "abcd")
 
-        form = ACaptchaedForm({})
-        captcha_response = utils.get_captcha_response(form)
-        self.assertEqual(len(captcha_response), 0)
+            form = ACaptchaedForm({})
+            captcha_response = utils.get_captcha_response(form)
+            self.assertEqual(len(captcha_response), 0)
 
     def test_build_submission_data(self):
 
