@@ -34,6 +34,20 @@ class AllCaptchaTests(TestCase):
             captcha_response = utils.get_captcha_response(form)
             self.assertEqual(len(captcha_response), 0)
 
+            # Test with Recaptcha
+            mock_settings.RECAPTCHA_PROVIDER_NAME = settings.RECAPTCHA_PROVIDER_NAME
+            mock_settings.PROVIDER = settings.RECAPTCHA_PROVIDER_NAME
+            mock_settings.CAPTCHA_SECRET_KEY = settings.RECAPTCHA_V2_SECRET_KEY
+            mock_settings.CAPTCHA_SITE_KEY = settings.RECAPTCHA_V2_SITE_KEY
+
+            form = ACaptchaedForm({"g-recaptcha-response": "abcd"})
+            captcha_response = utils.get_captcha_response(form)
+            self.assertEqual(captcha_response, "abcd")
+
+            form = ACaptchaedForm({})
+            captcha_response = utils.get_captcha_response(form)
+            self.assertEqual(len(captcha_response), 0)
+
     def test_build_submission_data(self):
 
         with patch("allcaptcha.utils.settings") as mock_settings:
@@ -64,33 +78,36 @@ class AllCaptchaTests(TestCase):
 
         self.assertFalse(success)
 
-        response = MagicMock()
+        if settings.PROVIDER == "hcaptcha" or (
+            settings.PROVIDER == "recaptcha" and settings.RECAPTCHA_VERSION == 2
+        ):
+            response = MagicMock()
 
-        response.json.return_value = {"success": True}
+            response.json.return_value = {"success": True}
 
-        response.status_code = 200
+            response.status_code = 200
 
-        success = utils._determine_success(response)
+            success = utils._determine_success(response)
 
-        self.assertTrue(success)
+            self.assertTrue(success)
 
-        response.json.return_value = {"success": False}
+            response.json.return_value = {"success": False}
 
-        success = utils._determine_success(response)
+            success = utils._determine_success(response)
 
-        self.assertFalse(success)
+            self.assertFalse(success)
 
-        response.json.return_value = {"success": True}
+            response.json.return_value = {"success": True}
 
-        response.status_code = 400
+            response.status_code = 400
 
-        self.assertFalse(success)
+            self.assertFalse(success)
 
-        response.status_code = 200
+            response.status_code = 200
 
-        response.json.side_effect = Exception
+            response.json.side_effect = Exception
 
-        self.assertFalse(success)
+            self.assertFalse(success)
 
     def test_get_provider_response(self):
 
@@ -107,35 +124,39 @@ class AllCaptchaTests(TestCase):
     def test_valid_response(self):
 
         with patch("allcaptcha.utils.requests") as mock_requests:
-            response = MagicMock()
-            response.status_code = 200
-            response.json.return_value = {"success": True}
-            mock_requests.post.return_value = response
+            if settings.PROVIDER == settings.HCAPTCHA_PROVIDER_NAME or (
+                settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME
+                and settings.RECAPTCHA_VERSION == 2
+            ):
+                response = MagicMock()
+                response.status_code = 200
+                response.json.return_value = {"success": True}
+                mock_requests.post.return_value = response
 
-            self.assertTrue(utils.valid_response("abcd"))
+                self.assertTrue(utils.valid_response("abcd"))
 
-            self.assertFalse(utils.valid_response(""))
+                self.assertFalse(utils.valid_response(""))
 
-            response = MagicMock()
-            response.status_code = 400
-            response.json.return_value = {"success": True}
-            mock_requests.post.return_value = response
+                response = MagicMock()
+                response.status_code = 400
+                response.json.return_value = {"success": True}
+                mock_requests.post.return_value = response
 
-            self.assertFalse(utils.valid_response("abcd"))
+                self.assertFalse(utils.valid_response("abcd"))
 
-            response = MagicMock()
-            response.status_code = 200
-            response.json.return_value = {"success": False}
-            mock_requests.post.return_value = response
+                response = MagicMock()
+                response.status_code = 200
+                response.json.return_value = {"success": False}
+                mock_requests.post.return_value = response
 
-            self.assertFalse(utils.valid_response("abcd"))
+                self.assertFalse(utils.valid_response("abcd"))
 
-            response = MagicMock()
-            response.status_code = 400
-            response.json.return_value = {"success": False}
-            mock_requests.post.return_value = response
+                response = MagicMock()
+                response.status_code = 400
+                response.json.return_value = {"success": False}
+                mock_requests.post.return_value = response
 
-            self.assertFalse(utils.valid_response("abcd"))
+                self.assertFalse(utils.valid_response("abcd"))
 
     def test_hcaptcha_form_mixin(self):
 
@@ -155,18 +176,27 @@ class AllCaptchaTests(TestCase):
 
     def test_templatetags(self):
 
-        sitekey = allcaptcha_tags.get_sitekey()
+        with patch("allcaptcha.templatetags.allcaptcha_tags.settings") as mock_settings:
+            # Test with Hcaptcha
+            mock_settings.HCAPTCHA_PROVIDER_NAME = settings.HCAPTCHA_PROVIDER_NAME
+            mock_settings.PROVIDER = settings.HCAPTCHA_PROVIDER_NAME
+            mock_settings.CAPTCHA_SECRET_KEY = settings.HCAPTCHA_SECRET_KEY
+            mock_settings.CAPTCHA_SITE_KEY = settings.HCAPTCHA_SITE_KEY
+            mock_settings.PROVIDER_CLASS_NAME = "h-captcha"
+            mock_settings.PROVIDER_JS_CALLBACK = "onHcaptchaSubmit"
 
-        self.assertEqual(sitekey, settings.CAPTCHA_SITE_KEY)
+            sitekey = allcaptcha_tags.get_sitekey()
 
-        klass = allcaptcha_tags.get_challenge_class()
+            self.assertEqual(sitekey, settings.HCAPTCHA_SITE_KEY)
 
-        self.assertEqual(klass, settings.PROVIDER_CLASS_NAME)
+            klass = allcaptcha_tags.get_challenge_class()
 
-        challenge_ctx = allcaptcha_tags.render_challenge()
+            self.assertEqual(klass, "h-captcha")
 
-        self.assertEqual(challenge_ctx["challenge_type"], "visible")
-        self.assertEqual(challenge_ctx["callback"], settings.PROVIDER_JS_CALLBACK)
-        self.assertEqual(challenge_ctx["text"], "submit")
-        self.assertEqual(challenge_ctx["class_name"], settings.PROVIDER_CLASS_NAME)
-        self.assertEqual(challenge_ctx["sitekey"], settings.CAPTCHA_SITE_KEY)
+            challenge_ctx = allcaptcha_tags.render_challenge()
+
+            self.assertEqual(challenge_ctx["challenge_type"], "visible")
+            self.assertEqual(challenge_ctx["callback"], "onHcaptchaSubmit")
+            self.assertEqual(challenge_ctx["text"], "submit")
+            self.assertEqual(challenge_ctx["class_name"], "h-captcha")
+            self.assertEqual(challenge_ctx["sitekey"], settings.HCAPTCHA_SITE_KEY)
