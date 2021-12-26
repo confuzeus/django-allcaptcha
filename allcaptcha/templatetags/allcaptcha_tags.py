@@ -1,5 +1,6 @@
 from django import template
 from allcaptcha import settings
+from django.utils.translation import gettext_lazy as _
 
 register = template.Library()
 
@@ -21,6 +22,11 @@ def get_callback_name():
 
 @register.inclusion_tag("allcaptcha/challenge.html")
 def render_challenge(challenge_type="visible", text="submit") -> dict:
+    if challenge_type == "visible" and (
+        settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME
+        and settings.RECAPTCHA_VERSION == 3
+    ):
+        raise ValueError(_("Recaptcha V3 can't be visible."))
     ctx = {
         "challenge_type": challenge_type,
         "callback": settings.PROVIDER_JS_CALLBACK,
