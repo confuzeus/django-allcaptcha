@@ -26,6 +26,9 @@ RECAPTCHA_URL = getattr(
 RECAPTCHA_V2_SECRET_KEY = getattr(settings, "RECAPTCHA_V2_SECRET_KEY", None)
 RECAPTCHA_V2_SITE_KEY = getattr(settings, "RECAPTCHA_V2_SITE_KEY", None)
 
+RECAPTCHA_V3_SECRET_KEY = getattr(settings, "RECAPTCHA_V3_SECRET_KEY", None)
+RECAPTCHA_V3_SITE_KEY = getattr(settings, "RECAPTCHA_V3_SITE_KEY", None)
+
 RECAPTCHA_JS = "https://www.google.com/recaptcha/api.js"
 RECAPTCHA_JS_CALLBACK = getattr(settings, "RECAPTCHA_JS_CALLBACK", "onRecaptchaSubmit")
 
@@ -55,15 +58,24 @@ elif PROVIDER == RECAPTCHA_PROVIDER_NAME:
 
         if not RECAPTCHA_V2_SITE_KEY:
             raise_for_attr("RECAPTCHA_V2_SITE_KEY")
+        CAPTCHA_SITE_KEY = RECAPTCHA_V2_SITE_KEY
+        CAPTCHA_SECRET_KEY = RECAPTCHA_V2_SECRET_KEY
+        PROVIDER_URL = RECAPTCHA_URL
+        PROVIDER_CLASS_NAME = "g-recaptcha"
+        PROVIDER_JS = RECAPTCHA_JS
+        PROVIDER_JS_CALLBACK = RECAPTCHA_JS_CALLBACK
     else:
-        raise ImproperlyConfigured("Recaptcha V3 not implemented yet!")
+        if not RECAPTCHA_V3_SECRET_KEY:
+            raise_for_attr("RECAPTCHA_V3_SECRET_KEY")
 
-    CAPTCHA_SITE_KEY = RECAPTCHA_V2_SITE_KEY
-    CAPTCHA_SECRET_KEY = RECAPTCHA_V2_SECRET_KEY
-    PROVIDER_URL = RECAPTCHA_URL
-    PROVIDER_CLASS_NAME = "g-recaptcha"
-    PROVIDER_JS = RECAPTCHA_JS
-    PROVIDER_JS_CALLBACK = RECAPTCHA_JS_CALLBACK
+        if not RECAPTCHA_V3_SITE_KEY:
+            raise_for_attr("RECAPTCHA_V3_SITE_KEY")
+        CAPTCHA_SITE_KEY = RECAPTCHA_V3_SITE_KEY
+        CAPTCHA_SECRET_KEY = RECAPTCHA_V3_SECRET_KEY
+        PROVIDER_URL = RECAPTCHA_URL
+        PROVIDER_CLASS_NAME = "g-recaptcha"
+        PROVIDER_JS = RECAPTCHA_JS
+        PROVIDER_JS_CALLBACK = RECAPTCHA_JS_CALLBACK
 else:
     raise ImproperlyConfigured(
         _(f'Provider  "{PROVIDER}" hasn\'t been implemented yet.')
