@@ -33,6 +33,6 @@ setup(
     name="django-allcaptcha",
     packages=find_packages(include=["allcaptcha", "allcaptcha.*"]),
     url="https://github.com/confuzeus/django-allcaptcha",
-    version="0.1.3",
+    version="0.1.4",
     zip_safe=False,
 )
