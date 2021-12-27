@@ -23,7 +23,7 @@ setup(
         "Environment :: Plugins",
         "Intended Audience :: Developers",
     ],
-    description="{{ cookiecutter.project_short_description }}",
+    description="Easily integrate captcha services in your Django project.",
     install_requires=["requests"],
     license="MIT license",
     long_description=readme,
