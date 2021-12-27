@@ -2,3 +2,4 @@ build
 twine
 requests
 Sphinx
+bump2version
