@@ -6,9 +6,25 @@
 Welcome to Django AllCaptcha's documentation!
 =============================================
 
+This package allows you to easily integrate captcha services in your Django project.
+
+Currently, it supports:
+
+- HCaptcha
+- Invisible HCaptcha
+- Recaptcha V2 Checkbox
+- Invisible Recaptcha V2
+- Recaptcha V3
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   installation
+   tutorial
+   settings
+   template-tags
+
 
 
 
@@ -16,5 +32,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
