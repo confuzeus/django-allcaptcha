@@ -1,3 +1,4 @@
 include LICENSE
 include README.md
-recursive-include allcaptcha *.html
+recursive-include allcaptcha *.html *.js
+recursive-include docs Makefile conf.py *.rst
