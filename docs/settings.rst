@@ -112,7 +112,7 @@ Recaptcha specific settings
 
     The Javascript file containing Recaptcha APIs.
 
-** RECAPTCHA_JS_CALLBACK**
+**RECAPTCHA_JS_CALLBACK**
 
     **Type:** str
 

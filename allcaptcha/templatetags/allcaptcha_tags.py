@@ -21,7 +21,9 @@ def get_callback_name():
 
 
 @register.inclusion_tag("allcaptcha/challenge.html")
-def render_challenge(challenge_type="visible", text="submit") -> dict:
+def render_challenge(
+    challenge_type="visible", text="submit", js_callback=settings.PROVIDER_JS_CALLBACK
+) -> dict:
     if challenge_type == "visible" and (
         settings.PROVIDER == settings.RECAPTCHA_PROVIDER_NAME
         and settings.RECAPTCHA_VERSION == 3
@@ -29,7 +31,7 @@ def render_challenge(challenge_type="visible", text="submit") -> dict:
         raise ValueError(_("Recaptcha V3 can't be visible."))
     ctx = {
         "challenge_type": challenge_type,
-        "callback": settings.PROVIDER_JS_CALLBACK,
+        "callback": js_callback,
         "text": text,
     }
     if (
