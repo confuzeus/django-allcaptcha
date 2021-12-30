@@ -18,6 +18,22 @@ Some come with sane defaults while others need to be set manually.
     - hcaptcha
     - recaptcha
 
+**CAPTCHA_CHALLENGE_THEME**
+
+    **Type:** str
+
+    **Default:** light
+
+    Specify either *dark* or *light* theme when rendering the challenge.
+
+**CAPTCHA_CHALLENGE_SIZE**
+
+    **Type:** str
+
+    **Default** normal
+
+    Render either a *normal* or *compact* sized challenge widget.
+
 HCaptcha specific settings
 --------------------------
 

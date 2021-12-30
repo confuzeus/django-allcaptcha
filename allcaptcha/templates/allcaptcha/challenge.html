@@ -1,6 +1,13 @@
 {% if challenge_type == "visible" %}
-    <div class="{{ class_name }}" data-sitekey="{{ sitekey }}"></div>
+    <div class="{{ class_name }}"
+         data-sitekey="{{ sitekey }}"
+         data-theme="{{ theme }}"
+         data-size="{{ size }}"></div>
 {% else %}
-    <button type="button" class="{{ class_name }}" data-sitekey="{{ sitekey }}" data-callback="{{ callback }}">{{ text }}</button>
+    <button type="button"
+            class="{{ class_name }}"
+            data-sitekey="{{ sitekey }}"
+            data-callback="{{ callback }}"
+            data-theme="{{ theme }}">{{ text }}</button>
 {% endif %}
 
